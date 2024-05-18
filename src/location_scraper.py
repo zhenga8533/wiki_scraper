@@ -4,6 +4,13 @@ from constants import *
 
 
 def get_titles(html: str) -> list:
+    """
+    Get the titles from the HTML.
+
+    :param html: The HTML to get the titles from.
+    :return: The titles from the HTML.
+    """
+
     titles = []
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -14,7 +21,14 @@ def get_titles(html: str) -> list:
             titles.append(link.get_text(strip=True))
     return titles
 
-def get_locations(titles: list):
+def get_locations(titles: list) -> dict:
+    """
+    Get the locations from the titles.
+    
+    :param titles: The titles to get the locations from.
+    :return: The locations from the titles.
+    """
+
     locations = {}
 
     for title in titles:
