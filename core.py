@@ -1,4 +1,5 @@
 import bs4
+import json
 import requests
 
 
@@ -13,16 +14,27 @@ def get_html(url):
     response = requests.get(url)
     return response.text
 
-def save_html(html: str, file_path: str):
+def save_html(html: str, file_name: str):
     """
     Save HTML to a file.
 
     :param html: The HTML to save.
-    :param file_path: The path to save the HTML to.
+    :param file_name: The path to save the HTML to.
     """
 
     soup = bs4.BeautifulSoup(html, 'html.parser')
     pretty_html = soup.prettify()
 
-    with open(file_path, 'w', encoding='utf-8') as file:
+    with open(f'html/file_name', 'w', encoding='utf-8') as file:
         file.write(pretty_html)
+    
+def save_json(data: dict, file_name: str):
+    """
+    Save JSON to a file.
+
+    :param data: The JSON to save.
+    :param file_name: The path to save the JSON to.
+    """
+
+    with open(f'json/{file_name}', 'w') as file:
+        json.dump(data, file, indent=4)
