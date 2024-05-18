@@ -25,7 +25,7 @@ def save_html(html: str, file_name: str):
     soup = bs4.BeautifulSoup(html, 'html.parser')
     pretty_html = soup.prettify()
 
-    with open(f'html/file_name', 'w', encoding='utf-8') as file:
+    with open(f'html/{file_name}', 'w', encoding='utf-8') as file:
         file.write(pretty_html)
     
 def save_json(data: dict, file_name: str):

@@ -1,8 +1,7 @@
 from bs4 import BeautifulSoup
 from core import *
+from constants import NPC_URL
 
-
-NPC_URL = 'https://wiki.hypixel.net/NPCs'
 
 def get_npcs(html: str) -> dict:
     """
@@ -80,4 +79,4 @@ def get_locations(npcs) -> dict:
 if __name__ == '__main__':
     html = get_html(NPC_URL)
     npcs = get_npcs(html)
-    save_json(get_locations(npcs), 'locations.json')
+    save_json(get_locations(npcs), 'npcs.json')
