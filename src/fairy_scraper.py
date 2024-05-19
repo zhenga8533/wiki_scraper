@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from core import *
 from constants import *
+from unidecode import unidecode
 
 
 def get_fairy_souls(html: str) -> dict:
@@ -36,7 +37,8 @@ def get_fairy_souls(html: str) -> dict:
             x = cols[0].get_text(strip=True)
             y = cols[1].get_text(strip=True)
             z = cols[2].get_text(strip=True)
-            zone = cols[3].get_text(strip=True)
+            zone = unidecode(cols[3].get_text(strip=True))
+
             souls.append([zone, x, y, z])
 
         if len(souls) > 0:
