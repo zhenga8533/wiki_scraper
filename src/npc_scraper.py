@@ -38,6 +38,13 @@ def get_npcs(html: str) -> dict:
     return npcs
 
 def find_locations(soup: BeautifulSoup) -> list:
+    """
+    Find the locations of an NPC.
+
+    :param soup: The BeautifulSoup object of the NPC wiki page.
+    :return: The locations of the NPC.
+    """
+
     locations = []
     location_tags = soup.find_all('td', style="display: flex;justify-content: space-around;padding: 5px 0px;")
     for location_tag in location_tags:
@@ -56,6 +63,13 @@ def find_locations(soup: BeautifulSoup) -> list:
     return locations
 
 def get_locations(npcs) -> dict:
+    """
+    Get the locations of the NPCs.
+    
+    :param npcs: The NPCs to get the locations of.
+    :return: The locations of the NPCs.
+    """
+
     locations = {}
 
     for area in npcs:
