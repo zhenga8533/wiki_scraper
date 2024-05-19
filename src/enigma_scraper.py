@@ -19,7 +19,7 @@ def get_enigma_souls(html: str) -> dict:
 
         for row in rows:
             cols = row.find_all('td')
-            if len(cols) < 6:
+            if len(cols) < 7:
                 continue
 
             name = cols[1].get_text(strip=True)
@@ -27,8 +27,9 @@ def get_enigma_souls(html: str) -> dict:
             y = cols[3].get_text(strip=True)
             z = cols[4].get_text(strip=True)
             zone = unidecode(cols[5].get_text(strip=True))
+            description = ' '.join(t.strip() for t in cols[6].stripped_strings)
 
-            enigma_souls[name] = [zone, x, y, z]
+            enigma_souls[name] = [zone, description, x, y, z]
 
     return enigma_souls
 
