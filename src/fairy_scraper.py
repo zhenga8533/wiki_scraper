@@ -46,6 +46,5 @@ def get_fairy_souls(html: str) -> dict:
 
 if __name__ == '__main__':
     html = get_html(FAIRY_SOUL_URL)
-    save_html(html, 'fairy_souls.html')
     fairy_souls = get_fairy_souls(html)
     save_json(fairy_souls, 'fairy_souls.json')
