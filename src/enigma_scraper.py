@@ -6,7 +6,7 @@ from unidecode import unidecode
 
 def get_enigma_souls(html: str) -> dict:
     soup = BeautifulSoup(html, 'html.parser')
-    enigma_souls = {}
+    enigma_souls = []
 
     # Find the Locations header
     locations_header = soup.find('span', {'id': 'Locations'})
@@ -29,7 +29,7 @@ def get_enigma_souls(html: str) -> dict:
             zone = unidecode(cols[5].get_text(strip=True))
             description = ' '.join(t.strip() for t in cols[6].stripped_strings)
 
-            enigma_souls[name] = [zone, description, x, y, z]
+            enigma_souls.append([name, zone, description, x, y, z])
 
     return enigma_souls
 
