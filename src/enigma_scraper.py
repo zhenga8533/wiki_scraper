@@ -5,20 +5,20 @@ from unidecode import unidecode
 
 
 def get_enigma_souls(html: str) -> dict:
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, "html.parser")
     enigma_souls = []
 
     # Find the Locations header
-    locations_header = soup.find('span', {'id': 'Locations'})
+    locations_header = soup.find("span", {"id": "Locations"})
 
     # Find the next table after the Locations header
-    table = locations_header.find_next('table', class_='wikitable')
+    table = locations_header.find_next("table", class_="wikitable")
 
     if table is not None:
-        rows = table.find_all('tr')[1:]
+        rows = table.find_all("tr")[1:]
 
         for row in rows:
-            cols = row.find_all('td')
+            cols = row.find_all("td")
             if len(cols) < 7:
                 continue
 
@@ -27,13 +27,14 @@ def get_enigma_souls(html: str) -> dict:
             y = cols[3].get_text(strip=True)
             z = cols[4].get_text(strip=True)
             zone = unidecode(cols[5].get_text(strip=True))
-            description = ' '.join(t.strip() for t in cols[6].stripped_strings)
+            description = " ".join(t.strip() for t in cols[6].stripped_strings)
 
             enigma_souls.append([name, zone, description, x, y, z])
 
     return enigma_souls
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     html = get_html(ENIGMA_SOUL_URL)
     enigma_souls = get_enigma_souls(html)
-    save_json(enigma_souls, 'enigma_souls.json')
+    save_json(enigma_souls, "enigma_souls.json")

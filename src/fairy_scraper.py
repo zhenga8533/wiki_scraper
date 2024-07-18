@@ -13,23 +13,23 @@ def get_fairy_souls(html: str) -> dict:
     """
 
     fairy_souls = {}
-    soup = BeautifulSoup(html, 'html.parser')
-    divs = soup.find_all('div', class_='hp-tabcontent')
+    soup = BeautifulSoup(html, "html.parser")
+    divs = soup.find_all("div", class_="hp-tabcontent")
 
     for div in divs:
         # Find wiki table in the div
-        table = div.find('table', class_='wikitable')
+        table = div.find("table", class_="wikitable")
         if table is None:
             continue
 
         # Find the rows in the table
-        rows = table.find_all('tr')[1:]
-        div_id = div.get('id').rstrip('_')
+        rows = table.find_all("tr")[1:]
+        div_id = div.get("id").rstrip("_")
         souls = []
 
         for row in rows:
             # Find the columns in the row
-            cols = row.find_all('td')
+            cols = row.find_all("td")
             if len(cols) < 4:
                 continue
 
@@ -46,7 +46,8 @@ def get_fairy_souls(html: str) -> dict:
 
     return fairy_souls
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     html = get_html(FAIRY_SOUL_URL)
     fairy_souls = get_fairy_souls(html)
-    save_json(fairy_souls, 'fairy_souls.json')
+    save_json(fairy_souls, "fairy_souls.json")
