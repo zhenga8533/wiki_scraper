@@ -7,5 +7,6 @@ LOCATION_URL = f"{HYPIXEL_URL}/Locations"
 
 # BSS
 BSS_URL = "https://bee-swarm-simulator.fandom.com/wiki"
+BEE_URL = f"{BSS_URL}/Bees"
 BQUIP_URL = f"{BSS_URL}/Beequip"
 STICKER_URL = f"{BSS_URL}/Sticker"
