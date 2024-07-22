@@ -24,7 +24,7 @@ def get_beequip_links(html: str) -> list:
     return links
 
 
-def get_beequips(links: list) -> dict:
+def get_beequips(links: list) -> list:
     """
     Get the beequips from the links.
 
@@ -32,7 +32,7 @@ def get_beequips(links: list) -> dict:
     :return: The beequips from the links.
     """
 
-    beequips = {}
+    beequips = []
     for link in links:
         html = get_html(link)
         soup = BeautifulSoup(html, "html.parser")
@@ -68,15 +68,18 @@ def get_beequips(links: list) -> dict:
             stats_list = stats_h2.find_next_sibling("ul")
             stats = [li.text.strip() for li in stats_list.find_all("li")]
 
-        beequips[name] = {
-            "level": level,
-            "color": color,
-            "limit": limit,
-            "description": description,
-            "bees": bees,
-            "requirement": requirement,
-            "stats": stats,
-        }
+        beequips.append(
+            {
+                "name": name,
+                "level": level,
+                "color": color,
+                "limit": limit,
+                "description": description,
+                "bees": bees,
+                "requirement": requirement,
+                "stats": stats,
+            }
+        )
 
     return beequips
 
