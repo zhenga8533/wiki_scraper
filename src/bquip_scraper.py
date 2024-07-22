@@ -40,6 +40,7 @@ def get_beequips(links: list) -> list:
         card = soup.find("div", class_="mw-parser-output")
         table = card.find("table", class_="infobox")
         name = table.select("tr td p")[0].text.strip()
+        image_url = table.find("a", class_="image").get("href").split("/revision")[0]
 
         # Extracting level, color, and limit
         details = table.select("table table td p")
@@ -71,6 +72,7 @@ def get_beequips(links: list) -> list:
         beequips.append(
             {
                 "name": name,
+                "image_url": image_url,
                 "level": level,
                 "color": color,
                 "limit": limit,
