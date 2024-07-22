@@ -52,7 +52,9 @@ def get_beequips(links: list) -> dict:
         try:
             requirements = table.select("tr td div p")[0]
             requirement = requirements.text[requirements.text.find("Bee") :].strip() or "None"
-            bees = [a["title"] for a in requirements.find_all("a", title=True)]
+            bees = [
+                a.find("img").get("data-src").split("/revision")[0] for a in requirements.find_all("a", title=True)
+            ]
         except:
             requirement = "None"
             bees = []
