@@ -3,7 +3,7 @@ from core import *
 from constants import STICKER_URL
 
 
-def get_stickers(html: str) -> list:
+def get_stickers(html: str) -> dict:
     """
     Get the stickers from the HTML.
 
