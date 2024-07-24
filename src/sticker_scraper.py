@@ -24,19 +24,20 @@ def get_stickers(html: str) -> dict:
             continue
         category = category_img["alt"].split(" ")[-1].lower()
         if category not in stickers:
-            stickers[category] = []
+            stickers[category] = {}
 
         for row in rows[1:]:
             cells = row.find_all(["th", "td"])
+            name = cells[1].text.strip()
+
             sticker_data = {
                 "image_url": cells[0].find("a")["href"].split("/revision")[0],
-                "name": cells[1].text.strip(),
                 "description": cells[2].text.strip(),
                 "stack_boost": cells[3].text.strip(),
                 "stack_reward": cells[4].text.strip(),
                 "where_from": cells[5].text.strip(),
             }
-            stickers[category].append(sticker_data)
+            stickers[category][name] = sticker_data
 
     return stickers
 
