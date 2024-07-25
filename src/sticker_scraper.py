@@ -46,5 +46,4 @@ if __name__ == "__main__":
     html = get_html(STICKER_URL)
     # save_html(html, "sticker.html")
     stickers = get_stickers(html)
-    for category, sticker_list in stickers.items():
-        save_json(sticker_list, f"{category}s.json")
+    save_json(stickers, "stickers.json")
