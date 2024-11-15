@@ -13,5 +13,4 @@ STICKER_URL = f"{BSS_URL}/Sticker"
 QUEST_GIVER_URL = f"{BSS_URL}/Quest_Givers"
 
 # PKMN
-PKDX_URL = "https://pokemondb.net/pokedex/national"
-PKMN_URL = "https://dex.pokemonshowdown.com/pokemon/"
+PKMN_URL = "https://pokemondb.net/pokedex/"
