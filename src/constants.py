@@ -14,3 +14,4 @@ QUEST_GIVER_URL = f"{BSS_URL}/Quest_Givers"
 
 # PKMN
 PKMN_URL = "https://pokemondb.net/pokedex/"
+MOVES_URL = "https://pokemondb.net/move/all"
