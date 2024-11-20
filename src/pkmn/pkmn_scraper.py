@@ -6,7 +6,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from core import *
-from constants import PKMN_URL
+from constants import PKDX_URL
 
 
 def get_pkmn_links(html: str) -> list:
@@ -30,7 +30,7 @@ def get_pkmn_links(html: str) -> list:
         generation = h2.find_next("div", class_="infocard-list infocard-list-pkmn-lg")
         for div in generation.find_all("div", class_="infocard"):
             pokemon = div.find("span", class_="infocard-lg-img").find("a").get("href").split("/")[-1]
-            links[i - 1].append(f"{PKMN_URL}{pokemon}")
+            links[i - 1].append(f"{PKDX_URL}{pokemon}")
         i += 1
 
     return links
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     start = args.start
     end = args.end
 
-    html = get_html(PKMN_URL + "national/")
+    html = get_html(PKDX_URL + "national/")
     links = get_pkmn_links(html)
 
     for i, generation in enumerate(links[start - 1 : end]):

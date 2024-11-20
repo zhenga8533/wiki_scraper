@@ -13,5 +13,7 @@ STICKER_URL = f"{BSS_URL}/Sticker"
 QUEST_GIVER_URL = f"{BSS_URL}/Quest_Givers"
 
 # PKMN
-PKMN_URL = "https://pokemondb.net/pokedex/"
-MOVES_URL = "https://pokemondb.net/move/all"
+PKMN_URL = "https://pokemondb.net"
+PKDX_URL = f"{PKMN_URL}/pokedex/"
+MOVES_URL = f"{PKMN_URL}/move/all"
+ABILITY_URL = f"{PKMN_URL}/ability"
