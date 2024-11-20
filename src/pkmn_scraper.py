@@ -44,6 +44,7 @@ def get_pkmn_data(html: str) -> list:
 
     # Initialize the data fields to fetch
     sprite = ""
+    name = soup.find("h1").text.strip()
     category = soup.find("th", text="Species").find_next_sibling("td").text.strip()
     number = int(soup.find("th", text="National №").find_next_sibling("td").text.strip())
     stats = {"HP": 0, "Attack": 0, "Defense": 0, "Sp. Atk": 0, "Sp. Def": 0, "Speed": 0, "Total": 0}
@@ -54,13 +55,24 @@ def get_pkmn_data(html: str) -> list:
     # Get generation 5/8 sprite
     sprite_table = soup.find("table", class_="sprites-table")
     if sprite_table:
-        sprites = sprite_table.find_all("td", class_="text-center")
-        sprite_prio = [4, 3, 2, 6, 7, 8, 5, 1, 0]
-        for i in sprite_prio:
-            img = sprites[i].find("img")
-            if img:
-                sprite = img.get("src")
-            if sprite:
+        normal_sprites = sprite_table.find("tbody").find("tr")
+        sprite_priority = [
+            "black-white",
+            "diamond-pearl",
+            "ruby-sapphire",
+            "sun-moon",
+            "sword-shield",
+            "scarlet-violet",
+            "x-y",
+            "silver",
+            "red-blue",
+        ]
+
+        for gen in sprite_priority:
+            src = f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.png"
+            cell = normal_sprites.find("img", src=f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.png")
+            if cell:
+                sprite = src
                 break
 
     # Get base stats
