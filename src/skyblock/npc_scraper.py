@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from core import *
-from constants import NPC_URL
+from constants import HYPIXEL_URL, NPC_URL
 
 
 def get_npcs(html: str) -> dict:
@@ -79,7 +83,7 @@ def get_locations(npcs) -> dict:
 
         for npc in npcs[area]:
             # Get the HTML of the NPC wiki page
-            npc_url = f'https://wiki.hypixel.net/{npc.replace(" ", "_")}'
+            npc_url = f'{HYPIXEL_URL}/{npc.replace(" ", "_")}'
             npc_html = get_html(npc_url)
             soup = BeautifulSoup(npc_html, "html.parser")
 

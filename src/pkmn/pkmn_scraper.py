@@ -1,8 +1,12 @@
 from bs4 import BeautifulSoup
-from core import *
-from constants import PKMN_URL
 import argparse
 import time
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from core import *
+from constants import PKMN_URL
 
 
 def get_pkmn_links(html: str) -> list:
@@ -77,7 +81,7 @@ def get_pkmn_data(html: str) -> list:
 
     # Get base stats
     stats_table = soup.find("h2", text="Base stats").find_next("table")
-    for row in stats_table.find_all("tr")[1:]:
+    for row in stats_table.find_all("tr"):
         stat_name = row.find("th").text.strip()
         stat_value = int(row.find_all("td")[0].text.strip())
         stats[stat_name] = stat_value
@@ -102,8 +106,10 @@ def get_pkmn_data(html: str) -> list:
         if move_cell:
             move_name = move_cell.text.strip()
             moves.append(move_name)
+    moves.sort()
 
     return {
+        "name": name,
         "sprite": sprite,
         "category": category,
         "number": number,

@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from core import *
-from constants import *
+from constants import HYPIXEL_URL, LOCATION_URL
 
 
 def get_titles(html: str) -> list:
@@ -35,7 +39,7 @@ def get_locations(titles: list) -> dict:
     for title in titles:
         # Get the HTML and create a BeautifulSoup object from it
         location = {}
-        location_url = f"{BASE_URL}/{title}"
+        location_url = f"{HYPIXEL_URL}/{title}"
         html = get_html(location_url)
         soup = BeautifulSoup(html, "html.parser")
 

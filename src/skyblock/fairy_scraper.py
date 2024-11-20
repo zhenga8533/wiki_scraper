@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup
-from core import *
-from constants import *
 from unidecode import unidecode
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from core import *
+from constants import FAIRY_SOUL_URL
 
 
 def get_fairy_souls(html: str) -> dict:

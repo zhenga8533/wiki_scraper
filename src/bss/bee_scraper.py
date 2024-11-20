@@ -1,4 +1,8 @@
 from bs4 import BeautifulSoup
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from core import *
 from constants import BEE_URL
 
