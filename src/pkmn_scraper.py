@@ -1,11 +1,7 @@
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from core import *
 from constants import PKMN_URL
+import argparse
 import time
 
 
@@ -44,15 +40,59 @@ def get_pkmn_data(html: str) -> list:
     :return: The data of a Pokemon.
     """
 
+    soup = BeautifulSoup(html, "html.parser")
+
     # Initialize the data fields to fetch
-    category = ""
-    number = 0
-    stats = {"HP": 0, "Attack": 0, "Defense": 0, "Sp. Atk": 0, "Sp. Def": 0, "Speed": 0}
-    abilities = []
-    types = []
+    sprite = ""
+    category = soup.find("th", text="Species").find_next_sibling("td").text.strip()
+    number = int(soup.find("th", text="National №").find_next_sibling("td").text.strip())
+    stats = {"HP": 0, "Attack": 0, "Defense": 0, "Sp. Atk": 0, "Sp. Def": 0, "Speed": 0, "Total": 0}
+    abilities = [a.text.strip() for a in soup.find("th", text="Abilities").find_next_sibling("td").find_all("a")]
+    types = [t.text.strip() for t in soup.find("th", text="Type").find_next_sibling("td").find_all("a")]
     moves = []
 
+    # Get generation 5/8 sprite
+    sprite_table = soup.find("table", class_="sprites-table")
+    if sprite_table:
+        sprites = sprite_table.find_all("td", class_="text-center")
+        sprite_prio = [4, 3, 2, 6, 7, 8, 5, 1, 0]
+        for i in sprite_prio:
+            img = sprites[i].find("img")
+            if img:
+                sprite = img.get("src")
+            if sprite:
+                break
+
+    # Get base stats
+    stats_table = soup.find("h2", text="Base stats").find_next("table")
+    for row in stats_table.find_all("tr")[1:]:
+        stat_name = row.find("th").text.strip()
+        stat_value = int(row.find_all("td")[0].text.strip())
+        stats[stat_name] = stat_value
+
+    # Get all moves
+    moves = []
+    moves_table = soup.find("h3", text="Moves learnt by level up").find_next("table")
+    for row in moves_table.find_all("tr")[1:]:
+        move_cell = row.find("td", class_="cell-name")
+        if move_cell:
+            move_name = move_cell.text.strip()
+            moves.append(move_name)
+    tm_table = soup.find("h3", text="Moves learnt by TM").find_next("table")
+    for row in tm_table.find_all("tr")[1:]:
+        move_cell = row.find("td", class_="cell-name")
+        if move_cell:
+            move_name = move_cell.text.strip()
+            moves.append(move_name)
+    egg_table = soup.find("h3", text="Egg moves").find_next("table")
+    for row in egg_table.find_all("tr")[1:]:
+        move_cell = row.find("td", class_="cell-name")
+        if move_cell:
+            move_name = move_cell.text.strip()
+            moves.append(move_name)
+
     return {
+        "sprite": sprite,
         "category": category,
         "number": number,
         "stats": stats,
@@ -63,11 +103,19 @@ def get_pkmn_data(html: str) -> list:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Pokemon Scraper")
+    parser.add_argument("--start", type=int, default=1, help="Generation to start parsing from (default: 1)")
+    parser.add_argument("--end", type=int, default=99, help="Generation to end parsing at (default: 99)")
+    args = parser.parse_args()
+    start = args.start
+    end = args.end
+
     html = get_html(PKMN_URL + "national/")
     links = get_pkmn_links(html)
 
-    for generation in links:
+    for i, generation in enumerate(links[start - 1 : end]):
         data = {}
+        print(f"Getting generation {i + start}...")
 
         for link in generation:
             pokemon = link.split("/")[-1]
@@ -76,5 +124,6 @@ if __name__ == "__main__":
             html = get_html(link)
             stats = get_pkmn_data(html)
             data[pokemon] = stats
-            break
-        break
+            time.sleep(0.5)
+
+        save_json(data, f"pkmn_gen{i + start}.json")
