@@ -141,9 +141,16 @@ if __name__ == "__main__":
             pokemon = link.split("/")[-1]
             print(f"Getting stats for {pokemon}...")
 
-            html = get_html(link)
-            stats = get_pkmn_data(html)
-            data[pokemon] = stats
-            time.sleep(0.5)
+            attempt = 0
+            while attempt < 3:
+                try:
+                    html = get_html(link)
+                    stats = get_pkmn_data(html)
+                    data[pokemon] = stats
+                    break
+                except Exception as e:
+                    print(f"Error: {e} - Attempt {attempt + 1}")
+                    attempt += 1
+                time.sleep(0.5)
 
         save_json(data, f"pkmn_gen{i + start}.json")
