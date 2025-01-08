@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import argparse
 import time
 import os
@@ -6,8 +7,9 @@ import re
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import PKDX_URL
+from util.core import *
+from util.constants import PKDX_URL
+from util.logger import Logger
 
 
 def get_pkmn_links(html: str) -> list:
@@ -123,34 +125,29 @@ def get_pkmn_data(html: str) -> list:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Pokemon Scraper")
-    parser.add_argument("--start", type=int, default=1, help="Generation to start parsing from (default: 1)")
-    parser.add_argument("--end", type=int, default=99, help="Generation to end parsing at (default: 99)")
-    args = parser.parse_args()
-    start = args.start
-    end = args.end
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+    START = int(os.getenv("START")) or 1
+    END = int(os.getenv("END")) or 99
 
-    html = get_html(PKDX_URL + "national/")
+    # Initialize logger
+    logger = Logger("Pokemon Scraper", "logs/pkmn_scraper.log", LOG)
+
+    # Scrape Pokemon and save them to JSON files
+    html = get_html(PKDX_URL + "national/", RETRIES, logger)
     links = get_pkmn_links(html)
 
-    for i, generation in enumerate(links[start - 1 : end]):
+    for i, generation in enumerate(links[START - 1 : END]):
         data = {}
-        print(f"Getting generation {i + start}...")
 
         for link in generation:
             pokemon = link.split("/")[-1]
-            print(f"Getting stats for {pokemon}...")
 
-            attempt = 0
-            while attempt < 3:
-                try:
-                    html = get_html(link)
-                    stats = get_pkmn_data(html)
-                    data[pokemon] = stats
-                    break
-                except Exception as e:
-                    print(f"Error: {e} - Attempt {attempt + 1}")
-                    attempt += 1
+            html = get_html(link, RETRIES, logger)
+            stats = get_pkmn_data(html)
+            data[pokemon] = stats
             time.sleep(0.5)
 
-        save_json(data, f"pkmn_gen{i + start}.json")
+        save_json(data, f"pkmn_gen{i + START}.json", logger)

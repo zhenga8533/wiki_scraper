@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import BEE_URL
+from util.core import *
+from util.constants import BEE_URL
+from util.logger import Logger
 
 
 def get_bee_links(html: str) -> list:
@@ -36,11 +38,21 @@ def get_bees(links: list) -> dict:
     """
 
     bees = {}
+    # TODO: Implement this function
     return bees
 
 
 if __name__ == "__main__":
-    html = get_html(BEE_URL)
+    # Load the environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize the logger
+    logger = Logger("Bee Scraper", "logs/bee_scraper.log", LOG)
+
+    # Scrape the bees and save them to a JSON file
+    html = get_html(BEE_URL, RETRIES, logger)
     # save_html(html, "bee.html")
     links = get_bee_links(html)
     print(links)

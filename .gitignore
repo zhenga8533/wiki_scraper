@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 html/
 json/
+logs/
 
 # C extensions
 *.so

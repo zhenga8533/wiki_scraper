@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import MOVES_URL
+from util.core import *
+from util.constants import MOVES_URL
+from util.logger import Logger
 
 
 def get_moves_data(html: str) -> list:
@@ -46,6 +48,15 @@ def get_moves_data(html: str) -> list:
 
 
 if __name__ == "__main__":
-    html = get_html(MOVES_URL)
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize logger
+    logger = Logger("Move Scraper", "logs/move_scraper.log", LOG)
+
+    # Scrape moves and save them to a JSON file
+    html = get_html(MOVES_URL, RETRIES, logger)
     moves = get_moves_data(html)
-    save_json(moves, "moves.json")
+    save_json(moves, "moves.json", logger)

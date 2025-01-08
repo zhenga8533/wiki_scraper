@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import HYPIXEL_URL, NPC_URL
+from util.core import *
+from util.constants import HYPIXEL_URL, NPC_URL
+from util.logger import Logger
 
 
 def get_npcs(html: str) -> dict:
@@ -68,11 +70,13 @@ def find_locations(soup: BeautifulSoup) -> list:
     return locations
 
 
-def get_locations(npcs) -> dict:
+def get_locations(npcs: dict, retries: int, logger: Logger) -> dict:
     """
     Get the locations of the NPCs.
 
     :param npcs: The NPCs to get the locations of.
+    :param retries: The number of retries to make.
+    :param logger: The logger to log to.
     :return: The locations of the NPCs.
     """
 
@@ -84,7 +88,7 @@ def get_locations(npcs) -> dict:
         for npc in npcs[area]:
             # Get the HTML of the NPC wiki page
             npc_url = f'{HYPIXEL_URL}/{npc.replace(" ", "_")}'
-            npc_html = get_html(npc_url)
+            npc_html = get_html(npc_url, retries, logger)
             soup = BeautifulSoup(npc_html, "html.parser")
 
             # Find and store the locations of the NPC
@@ -98,6 +102,16 @@ def get_locations(npcs) -> dict:
 
 
 if __name__ == "__main__":
-    html = get_html(NPC_URL)
-    npcs = get_npcs(html)
-    save_json(get_locations(npcs), "npcs.json")
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize logger
+    logger = Logger("NPC Scraper", "logs/npc_scraper.log", LOG)
+
+    # Scrape NPCs and save them to a JSON file
+    html = get_html(NPC_URL, RETRIES, logger)
+    npcs = get_npcs(html, RETRIES, logger)
+    locations = get_locations(npcs, RETRIES, logger)
+    save_json(locations, "npcs.json", logger)

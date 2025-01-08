@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import ABILITY_URL
+from util.core import *
+from util.constants import ABILITY_URL
+from util.logger import Logger
 
 
 def get_ability_data(html: str) -> dict:
@@ -41,6 +43,15 @@ def get_ability_data(html: str) -> dict:
 
 
 if __name__ == "__main__":
-    html = get_html(ABILITY_URL)
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize logger
+    logger = Logger("Ability Scraper", "logs/ability_scraper.log", LOG)
+
+    # Scrape abilities and save them to a JSON file
+    html = get_html(ABILITY_URL, RETRIES, logger)
     data = get_ability_data(html)
-    save_json(data, "abilities.json")
+    save_json(data, "abilities.json", logger)

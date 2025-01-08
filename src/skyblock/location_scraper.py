@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import HYPIXEL_URL, LOCATION_URL
+from util.core import *
+from util.constants import HYPIXEL_URL, LOCATION_URL
+from util.logger import Logger
 
 
 def get_titles(html: str) -> list:
@@ -26,11 +28,13 @@ def get_titles(html: str) -> list:
     return titles
 
 
-def get_locations(titles: list) -> dict:
+def get_locations(titles: list, retries: int, logger: Logger) -> dict:
     """
     Get the locations from the titles.
 
     :param titles: The titles to get the locations from.
+    :param retries: The number of retries to make.
+    :param logger: The logger to log to.
     :return: The locations from the titles.
     """
 
@@ -40,7 +44,7 @@ def get_locations(titles: list) -> dict:
         # Get the HTML and create a BeautifulSoup object from it
         location = {}
         location_url = f"{HYPIXEL_URL}/{title}"
-        html = get_html(location_url)
+        html = get_html(location_url, retries, logger)
         soup = BeautifulSoup(html, "html.parser")
 
         # Find the span tag with id="Zones"
@@ -80,7 +84,16 @@ def get_locations(titles: list) -> dict:
 
 
 if __name__ == "__main__":
-    html = get_html(LOCATION_URL)
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize logger
+    logger = Logger("Location Scraper", "logs/location_scraper.log", LOG)
+
+    # Scrape locations and save them to a JSON file
+    html = get_html(LOCATION_URL, RETRIES, logger)
     titles = get_titles(html)
-    locations = get_locations(titles)
-    save_json(locations, "locations.json")
+    locations = get_locations(titles, RETRIES, logger)
+    save_json(locations, "locations.json", logger)

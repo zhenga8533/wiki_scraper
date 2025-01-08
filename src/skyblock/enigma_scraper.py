@@ -1,14 +1,23 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from unidecode import unidecode
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import ENIGMA_SOUL_URL
+from util.core import *
+from util.constants import ENIGMA_SOUL_URL
+from util.logger import Logger
 
 
 def get_enigma_souls(html: str) -> dict:
+    """
+    Scrape the enigma souls from the HTML.
+
+    :param html: The HTML to get the enigma souls from.
+    :return: The enigma souls from the HTML.
+    """
+
     soup = BeautifulSoup(html, "html.parser")
     enigma_souls = []
 
@@ -39,6 +48,15 @@ def get_enigma_souls(html: str) -> dict:
 
 
 if __name__ == "__main__":
-    html = get_html(ENIGMA_SOUL_URL)
+    # Load environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize logger
+    logger = Logger("Enigma Soul Scraper", "logs/enigma_scraper.log", LOG)
+
+    # Scrape enigma souls and save them to a JSON file
+    html = get_html(ENIGMA_SOUL_URL, RETRIES, logger)
     enigma_souls = get_enigma_souls(html)
-    save_json(enigma_souls, "enigma_souls.json")
+    save_json(enigma_souls, "enigma_souls.json", logger)

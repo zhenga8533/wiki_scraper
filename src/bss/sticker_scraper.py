@@ -1,15 +1,18 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import STICKER_URL
+from util.core import *
+from util.constants import STICKER_URL
+from util.logger import Logger
 
 
 def get_stickers(html: str) -> dict:
     """
     Get the stickers from the HTML.
+    Currently does not work with updated wiki page.
 
     :param html: The HTML to get the stickers from.
     :return: The stickers from the HTML.
@@ -23,10 +26,17 @@ def get_stickers(html: str) -> dict:
         rows = table.find_all("tr")  # Skip the header row
 
         # Parse out the category
-        category_img = rows[0].find("th").find("a").find("img")
-        if category_img is None:
+        th = rows[0].find("th")
+        if th is None:
             continue
-        category = category_img["alt"].split(" ")[-1].lower()
+        a = th.find("a")
+        if a is None:
+            continue
+        img = a.find("img")
+        if img is None:
+            continue
+
+        category = img["alt"].split(" ")[-1].lower()
         if category not in stickers:
             stickers[category] = {}
 
@@ -47,7 +57,15 @@ def get_stickers(html: str) -> dict:
 
 
 if __name__ == "__main__":
-    html = get_html(STICKER_URL)
-    # save_html(html, "sticker.html")
+    # Load the environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize the logger
+    logger = Logger("Sticker Scraper", "logs/sticker_scraper.log", LOG)
+
+    # Scrape the stickers and save them to a JSON file
+    html = get_html(STICKER_URL, RETRIES, logger)
     stickers = get_stickers(html)
-    save_json(stickers, "stickers.json")
+    save_json(stickers, "stickers.json", logger)

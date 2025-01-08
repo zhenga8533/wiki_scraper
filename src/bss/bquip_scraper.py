@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from core import *
-from constants import BQUIP_URL
+from util.core import *
+from util.constants import BQUIP_URL
+from util.logger import Logger
 
 
 def get_beequip_links(html: str) -> list:
@@ -28,17 +30,19 @@ def get_beequip_links(html: str) -> list:
     return links
 
 
-def get_beequips(links: list) -> list:
+def get_beequips(links: list, retries: int, logger: Logger) -> list:
     """
     Get the beequips from the links.
 
     :param links: The links to get the beequips from.
+    :param retries: The number of retries to make.
+    :param logger: The logger to log to.
     :return: The beequips from the links.
     """
 
     beequips = []
     for link in links:
-        html = get_html(link)
+        html = get_html(link, retries, logger)
         soup = BeautifulSoup(html, "html.parser")
 
         card = soup.find("div", class_="mw-parser-output")
@@ -91,8 +95,16 @@ def get_beequips(links: list) -> list:
 
 
 if __name__ == "__main__":
-    html = get_html(BQUIP_URL)
-    # save_html(html, "beequip.html")
+    # Load the environment variables
+    load_dotenv()
+    LOG = os.getenv("LOG") == "True"
+    RETRIES = int(os.getenv("RETRIES"))
+
+    # Initialize the logger
+    logger = Logger("Beequip Scraper", "logs/beequip_scraper.log", LOG)
+
+    # Scrape the beequips and save them to a JSON file
+    html = get_html(BQUIP_URL, RETRIES, logger)
     links = get_beequip_links(html)
-    beequips = get_beequips(links)
-    save_json(beequips, "beequips.json")
+    beequips = get_beequips(links, RETRIES, logger)
+    save_json(beequips, "beequips.json", logger)
