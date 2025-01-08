@@ -72,9 +72,10 @@ def get_pkmn_data(html: str) -> list:
             "silver",
             "red-blue",
         ]
+        pokemon_name = name.lower().replace(" ", "-")
 
         for gen in sprite_priority:
-            pattern = re.compile(f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.*")
+            pattern = re.compile(f"https://img.pokemondb.net/sprites/{gen}/normal.*{pokemon_name}.*")
             img_tag = soup.find("img", src=pattern)
             if img_tag:
                 sprite = img_tag["src"]
