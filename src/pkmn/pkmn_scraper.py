@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import argparse
 import time
 import os
+import re
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -56,15 +57,15 @@ def get_pkmn_data(html: str) -> list:
     types = [t.text.strip() for t in soup.find("th", text="Type").find_next_sibling("td").find_all("a")]
     moves = []
 
-    # Get generation 5/8 sprite
+    # Get sprites in order of priority
     sprite_table = soup.find("table", class_="sprites-table")
     if sprite_table:
-        normal_sprites = sprite_table.find("tbody").find("tr")
         sprite_priority = [
             "black-white",
             "diamond-pearl",
             "ruby-sapphire",
             "sun-moon",
+            "ultra-sun-ultra-moon",
             "sword-shield",
             "scarlet-violet",
             "x-y",
@@ -73,10 +74,10 @@ def get_pkmn_data(html: str) -> list:
         ]
 
         for gen in sprite_priority:
-            src = f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.png"
-            cell = normal_sprites.find("img", src=f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.png")
-            if cell:
-                sprite = src
+            pattern = re.compile(f"https://img.pokemondb.net/sprites/{gen}/normal/{name.lower()}.*")
+            img_tag = soup.find("img", src=pattern)
+            if img_tag:
+                sprite = img_tag["src"]
                 break
 
     # Get base stats
@@ -88,24 +89,24 @@ def get_pkmn_data(html: str) -> list:
 
     # Get all moves
     moves = []
-    moves_table = soup.find("h3", text="Moves learnt by level up").find_next("table")
-    for row in moves_table.find_all("tr")[1:]:
-        move_cell = row.find("td", class_="cell-name")
-        if move_cell:
-            move_name = move_cell.text.strip()
-            moves.append(move_name)
-    tm_table = soup.find("h3", text="Moves learnt by TM").find_next("table")
-    for row in tm_table.find_all("tr")[1:]:
-        move_cell = row.find("td", class_="cell-name")
-        if move_cell:
-            move_name = move_cell.text.strip()
-            moves.append(move_name)
-    egg_table = soup.find("h3", text="Egg moves").find_next("table")
-    for row in egg_table.find_all("tr")[1:]:
-        move_cell = row.find("td", class_="cell-name")
-        if move_cell:
-            move_name = move_cell.text.strip()
-            moves.append(move_name)
+    moves_headings = [
+        "Moves learnt by level up",
+        "Moves learnt by TM",
+        "Egg moves",
+        "Moves learnt by transfer from another game",
+        "Tutor moves",
+        "Previous moves",
+    ]
+    for heading in moves_headings:
+        moves_heading = soup.find("h3", text=heading)
+        if moves_heading:
+            moves_table = moves_heading.find_next("table")
+            for row in moves_table.find_all("tr")[1:]:
+                move_cell = row.find("td", class_="cell-name")
+                if move_cell:
+                    move_name = move_cell.text.strip()
+                    if move_name not in moves:
+                        moves.append(move_name)
     moves.sort()
 
     return {
