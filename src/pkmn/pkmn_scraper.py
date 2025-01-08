@@ -151,6 +151,6 @@ if __name__ == "__main__":
                 except Exception as e:
                     print(f"Error: {e} - Attempt {attempt + 1}")
                     attempt += 1
-                time.sleep(0.5)
+            time.sleep(0.5)
 
         save_json(data, f"pkmn_gen{i + start}.json")
