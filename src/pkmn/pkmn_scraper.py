@@ -39,11 +39,12 @@ def get_pkmn_links(html: str) -> list:
     return links
 
 
-def get_pkmn_data(html: str) -> list:
+def get_pkmn_data(html: str, pokemon: str) -> list:
     """
     Get the data of a Pokemon from the HTML.
 
     :param html: The HTML to get the data from.
+    :param pokemon: The name of the Pokemon.
     :return: The data of a Pokemon.
     """
 
@@ -74,10 +75,9 @@ def get_pkmn_data(html: str) -> list:
             "silver",
             "red-blue",
         ]
-        pokemon_name = name.lower().replace(" ", "-")
 
         for gen in sprite_priority:
-            pattern = re.compile(f"https://img.pokemondb.net/sprites/{gen}/normal.*{pokemon_name}.*")
+            pattern = re.compile(f"https://img.pokemondb.net/sprites/{gen}/normal.*{pokemon}.*")
             img_tag = soup.find("img", src=pattern)
             if img_tag:
                 sprite = img_tag["src"]
@@ -146,7 +146,7 @@ if __name__ == "__main__":
             pokemon = link.split("/")[-1]
 
             html = get_html(link, RETRIES, logger)
-            stats = get_pkmn_data(html)
+            stats = get_pkmn_data(html, pokemon)
             data[pokemon] = stats
             time.sleep(0.5)
 
